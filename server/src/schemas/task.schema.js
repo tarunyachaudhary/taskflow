@@ -26,11 +26,19 @@ const createTaskSchema = Joi.object({
         .default("medium"),
 
     categoryId: Joi.string()
-        .optional(),
+        .hex()
+        .length(24)
+        .allow(null),
 
     dueDate: Joi.date()
         .iso()
         .optional(),
+    
+    status: Joi.string()
+        .valid("pending", "in-progress", "completed")
+        .default("pending"),
+    
+    reminderAt: Joi.date().iso().allow(null),
 });
 
 const updateTaskSchema = Joi.object({
@@ -46,38 +54,54 @@ const updateTaskSchema = Joi.object({
     priority: Joi.string()
         .valid("low", "medium", "high"),
 
-    categoryId: Joi.string(),
+    categoryId: Joi.string()
+        .hex()
+        .length(24)
+        .allow(null),
 
     dueDate: Joi.date()
         .iso()
         .allow(null),
 
-    completed: Joi.boolean(),
-});
+    status: Joi.string().valid(
+        "pending",
+        "in-progress",
+        "completed"
+    ),
+    reminderAt: Joi.date().iso().allow(null),
+}).min(1);
 
 const taskQuerySchema = Joi.object({
-    status: Joi.string()
-        .valid("all", "active", "completed")
-        .default("all"),
+    status: Joi.string().valid(
+        "pending",
+        "in-progress",
+        "completed"
+    ),
 
-    priority: Joi.string()
-        .valid("low", "medium", "high"),
+    priority: Joi.string().valid(
+        "low",
+        "medium",
+        "high"
+    ),
 
-    categoryId: Joi.string(),
+    categoryId: Joi.string().hex().length(24),
 
-    search: Joi.string()
-        .allow(""),
+    search: Joi.string().trim().max(100),
 
-    page: Joi.number()
-        .integer()
-        .min(1)
-        .default(1),
+    page: Joi.number().integer().min(1).default(1),
 
-    limit: Joi.number()
-        .integer()
-        .min(1)
-        .max(100)
-        .default(20),
+    limit: Joi.number().integer().min(1).max(100).default(20),
+
+    sortBy: Joi.string().valid(
+        "createdAt",
+        "updatedAt",
+        "dueDate",
+        "priority"
+    ).default("createdAt"),
+
+    sortOrder: Joi.string()
+        .valid("asc", "desc")
+        .default("desc"),
 });
 
 module.exports = {

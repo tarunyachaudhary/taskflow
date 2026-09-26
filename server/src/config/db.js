@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 import env from "./env.js";
+import logger from "../utils/logger.js";
 
-const connectDB = async () => {
+const connectDatabase = async () => {
     if (!env.databaseUri) {
-        throw new Error("MOGODBURI is not set in the environment");
+        throw new Error("DATABASE_URI is not set in the environment");
     }
 
     await mongoose.connect(env.databaseUri);
-    console.log("Database connected successfully!");
+
+    logger.info("Database connected successfully!");
 };
 
-export default connectDB;
+export default connectDatabase;
